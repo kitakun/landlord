@@ -1,0 +1,7 @@
+{
+    "user": "migrator",
+    "host": "localhost",
+    "database": "landing",
+    "password": "migrator",
+    "port": 5432
+}

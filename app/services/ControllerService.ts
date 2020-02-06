@@ -1,0 +1,39 @@
+import path = require('path');
+import fs = require('fs');
+
+import express = require('express');
+
+import IInjectableController from '../controllers/InjectableController';
+
+var isAlreadyInited: Boolean = false;
+
+export interface IControllerService {
+    Init(server: express.Application): void;
+}
+
+const singletoneService: IControllerService = {
+    Init: function (server: express.Application) {
+
+        if (isAlreadyInited)
+            return console.warn('Controllers already inited!');
+
+        const directoryPath = path.join(__dirname, '../controllers');
+
+        var files = fs.readdirSync(directoryPath);
+
+        files.forEach(function (file) {
+            var Controller = require(path.join(directoryPath, file)).default;
+            if (Controller) {
+                var controllerInstance: IInjectableController = new Controller();
+
+                controllerInstance.Inject(server);
+
+                console.log(`Controller ${file} setted`);
+            }
+        });
+
+        isAlreadyInited = true;
+    }
+}
+
+export { singletoneService };

@@ -1,0 +1,4 @@
+CREATE TABLE LandingEntity(
+  Id serial PRIMARY KEY,
+  Name VARCHAR (255) UNIQUE NOT NULL
+);
