@@ -1,6 +1,8 @@
 interface ILandingEntity {
     Id: number;
     Name: string;
+    WebPort: number;
+    RunAtStartup: boolean;
 
     Data: ILandingDataEntity[] | undefined;
 }

@@ -25,6 +25,7 @@ export default interface Idb {
     queryPromise(text: string, params: any): Promise<any>,
     getClient: (callback: (err: Error, client: PoolClient, done: (release?: any) => void) => void) => void;
     validateConnection(): Promise<boolean>;
+    hasTables(): Promise<boolean>;
 }
 
 const moduleSingleton: Idb = {
@@ -33,7 +34,7 @@ const moduleSingleton: Idb = {
             const start = Date.now()
             return pool.query(text, params, (err, res) => {
                 const duration = Date.now() - start
-                console.log('executed query', { text, duration, rows: res.rowCount })
+                console.log('[db] executed query', { text, duration, rows: res.rowCount })
                 callback(err, res)
             });
         } else {
@@ -57,8 +58,8 @@ const moduleSingleton: Idb = {
                 };
                 // set a timeout of 5 seconds, after which we will log this client's last query
                 const timeout = setTimeout(() => {
-                    console.error('A client has been checked out for more than 5 seconds!')
-                    console.error(`The last executed query on this client was: ${typedClient.lastQuery}`)
+                    console.error('[db] A client has been checked out for more than 5 seconds!')
+                    console.error(`[db] The last executed query on this client was: ${typedClient.lastQuery}`)
                 }, 5000);
                 const release = (err: Error) => {
                     // call the actual 'done' method, returning this client to the pool
@@ -75,6 +76,12 @@ const moduleSingleton: Idb = {
     async validateConnection(): Promise<boolean> {
         var result = await pool.query('SELECT NOW()');
         return !!result;
+    },
+    async hasTables(): Promise<boolean>{
+        const hasTableScriptPath = path.join(__dirname, '../../PsqlScripts/System', 'ShowAllTables.sql');
+        const hasTableScriptBody = fs.readFileSync(hasTableScriptPath).toString('utf8');
+        const { rows } = await this.queryPromise(hasTableScriptBody, null);
+        return rows.length > 0;
     }
 };
 

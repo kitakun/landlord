@@ -1,4 +1,6 @@
-CREATE TABLE LandingEntity(
-  Id serial PRIMARY KEY,
-  Name VARCHAR (255) UNIQUE NOT NULL
+CREATE TABLE "LandingEntity" (
+  "Id" serial PRIMARY KEY,
+  "WebPort" INTEGER UNIQUE NOT NULL,
+  "RunAtStartup" BOOLEAN DEFAULT TRUE NOT NULL,
+  "Name" VARCHAR (255) UNIQUE NOT NULL
 );

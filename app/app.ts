@@ -2,13 +2,16 @@ import express = require('express');
 
 import * as contrlService from './services/ControllerService';
 import * as databaseAccess from './db/index';
+import setService from './services/SettingsService';
 
-const app: express.Application = express();
+const ultraApp: express.Application = express();
 const port = process.env.PORT || 3000;
 
-contrlService.singletoneService.Init(app);
+setService.startWatching();
+
+contrlService.singletoneService.Init(ultraApp);
 databaseAccess
     .module
     .validateConnection()
-    .then(_ => app.listen(port, () => console.log(`Example app listening on port ${port}!`)))
+    .then(_ => ultraApp.listen(port, () => console.log(`[app.ts] Example app listening on port ${port}!`)))
     .catch(err => console.error(err));

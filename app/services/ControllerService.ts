@@ -15,7 +15,7 @@ const singletoneService: IControllerService = {
     Init: function (server: express.Application) {
 
         if (isAlreadyInited)
-            return console.warn('Controllers already inited!');
+            return console.warn('[ControllersService] Controllers already inited!');
 
         const directoryPath = path.join(__dirname, '../controllers');
 
@@ -28,7 +28,7 @@ const singletoneService: IControllerService = {
 
                 controllerInstance.Inject(server);
 
-                console.log(`Controller ${file} setted`);
+                console.log(`[ControllersService] Controller ${file} setted`);
             }
         });
 
