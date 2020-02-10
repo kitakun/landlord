@@ -8,6 +8,10 @@ import IInjectableController from '../controllers/InjectableController';
 var isAlreadyInited: Boolean = false;
 
 export interface IControllerService {
+    /**
+     * Load all controllers and inject them in express instance
+     * @param server express instance
+     */
     Init(server: express.Application): void;
 }
 
