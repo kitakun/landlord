@@ -6,8 +6,9 @@ import { module as db } from './index';
 export default class CreatePostgresTables {
     public async CreateTables(): Promise<void> {
 
-        if(await db.hasTables())
+        if (await db.hasTables()) {
             throw new Error('Database already have tables!');
+        }
 
         const directoryPath = path.join(__dirname, '../../PsqlScripts/CreateTablesFromZero');
 

@@ -1,8 +1,9 @@
+// System
 import path = require('path');
 import fs = require('fs');
-
+// Packages
 import express = require('express');
-
+// Components
 import IInjectableController from '../controllers/InjectableController';
 
 var isAlreadyInited: Boolean = false;
@@ -23,7 +24,7 @@ const singletoneService: IControllerService = {
 
         const directoryPath = path.join(__dirname, '../controllers');
 
-        var files = fs.readdirSync(directoryPath);
+        const files = fs.readdirSync(directoryPath);
 
         files.forEach(function (file) {
             var Controller = require(path.join(directoryPath, file)).default;

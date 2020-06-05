@@ -1,13 +1,16 @@
 import express = require('express');
-
+// Components
 import IInjectableController from './InjectableController';
 import settings from '../services/SettingsService';
 import landingService from '../services/LandingService';
-
+// Database
 import landingRepository from '../db/Repositories/LandingEntityRepo';
 import dbCreator from '../db/createTables';
 
-// Ultra admin space
+/**
+ * Ultra admin space
+ * Control under all spaces, enabling, disabling, etc
+ */
 export default class UltraController implements IInjectableController {
 
     public Inject(app: express.Application): void {
@@ -28,7 +31,7 @@ export default class UltraController implements IInjectableController {
 
         //GET start existing landing
         app.get('/ultra/startlanding/:name', (req, res) => this._secureAction(req, res, () => {
-            let landingName = req.params.name;
+            const landingName = req.params.name;
             if (!landingName) {
                 res
                     .status(405)
@@ -54,7 +57,7 @@ export default class UltraController implements IInjectableController {
 
         //GET stop existing landing
         app.get('/ultra/stoplanding/:name', (req, res) => this._secureAction(req, res, () => {
-            let landingName = req.params.name;
+            const landingName = req.params.name;
             if (!landingName) {
                 res
                     .status(405)
@@ -72,9 +75,9 @@ export default class UltraController implements IInjectableController {
     }
 
     private _secureAction(req: express.Request, res: express.Response, action: () => void): void {
-        let currentIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-        let host = req.get('host');
-        let settingsData = settings.getSettings();
+        const currentIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        const host = req.get('host');
+        const settingsData = settings.getSettings();
 
         const ultraDomain = settingsData.UltraDomain || '';
         const trustedIPs = settingsData.TrustedIPs || [];

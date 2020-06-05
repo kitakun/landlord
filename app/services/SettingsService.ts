@@ -1,16 +1,19 @@
+// System
 import fs from 'fs';
 import path from 'path';
-
-import ILandingAppSettings from '../models/Settingsmodel';
+// Models
+import ILandingAppSettings from '../models/Settings.model';
 
 const settingFilePath = path.join(__dirname, '../settings.json');
+const settingWatchWithInterval = 2500;
 
 var settings: ILandingAppSettings = {};
 
 function updateSettingData(): void {
-    fs.readFile(settingFilePath, (err, settingsBuffer) => {
+    fs.readFile(settingFilePath, (err: NodeJS.ErrnoException | null, settingsBuffer: Buffer) => {
         if (err)
             throw err;
+
         try {
             settings = JSON.parse(settingsBuffer.toString('utf8'));
             console.log('[SettingsService] Settings updated successfully');
@@ -26,7 +29,7 @@ function updateSettingData(): void {
 const startWatching = () => {
     console.log('[SettingsService] Settings file being watched');
     updateSettingData();
-    fs.watchFile(settingFilePath, { interval: 2500 }, (curr, prev) => {
+    fs.watchFile(settingFilePath, { interval: settingWatchWithInterval }, (_, __) => {
         console.log('[SettingsService] Settings has changed');
         updateSettingData();
     });
