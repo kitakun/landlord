@@ -70,7 +70,7 @@ export default class SpacesList extends Vue {
   enableSpace(item: AdminExisgintSpace): void {
     this.isLoading = true;
     axios({
-      method: "GET",
+      method: "POST",
       url: `http://127.0.0.1:3000/ultra/startlanding/${item.Name}`
     })
       .then(resp => this.reloadList())
@@ -87,7 +87,7 @@ export default class SpacesList extends Vue {
   disableSpace(item: AdminExisgintSpace): void {
     this.isLoading = true;
     axios({
-      method: "GET",
+      method: "POST",
       url: `http://127.0.0.1:3000/ultra/stoplanding/${item.Name}`
     })
       .then(resp => this.reloadList())

@@ -5,6 +5,7 @@ import settings from '../services/SettingsService';
 import landingService from '../services/LandingService';
 import { stack } from '../utils/landingStack';
 import { AdminExisgintSpace } from '../models/Admin.model';
+import { notFoundMiddleware, errorMiddleware } from '../utils/errorMiddleware';
 // Database
 import landingRepository from '../db/Repositories/LandingEntityRepo';
 import dbCreator from '../db/createTables';
@@ -18,7 +19,7 @@ export default class UltraController implements IInjectableController {
     public Inject(app: express.Application): void {
 
         //GET home route
-        app.get('/ultra', (req, res) => this._secureAction(req, res, () => {
+        app.get('/ultra', (req, res, next: (errd?: any) => void) => this._secureAction(req, res, () => {
             res.send('index.html is not implemented yet');
         }));
 
@@ -31,8 +32,8 @@ export default class UltraController implements IInjectableController {
                 .catch(err => res.send(err?.message));
         }));
 
-        //GET start existing landing
-        app.get('/ultra/startlanding/:name', (req, res) => this._secureAction(req, res, () => {
+        //POST start existing landing
+        app.post('/ultra/startlanding/:name', (req, res) => this._secureAction(req, res, () => {
             const landingName = req.params.name;
             if (!landingName) {
                 res
@@ -60,8 +61,8 @@ export default class UltraController implements IInjectableController {
             }
         }));
 
-        //GET stop existing landing
-        app.get('/ultra/stoplanding/:name', (req, res) => this._secureAction(req, res, () => {
+        //POST stop existing landing
+        app.post('/ultra/stoplanding/:name', (req, res) => this._secureAction(req, res, () => {
             const landingName = req.params.name;
             if (!landingName) {
                 res
@@ -100,6 +101,11 @@ export default class UltraController implements IInjectableController {
                         .json({ message: 'error while loading loadAllLandingsWithPortsAsync' });
                 });
         }));
+
+        app.get('*', notFoundMiddleware);
+        app.post('*', notFoundMiddleware);
+
+        app.use((e: any, req: any, res: any, n: any) => errorMiddleware(e, req, res));
     }
 
     private _secureAction(req: express.Request, res: express.Response, action: () => void): void {
