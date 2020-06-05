@@ -44,6 +44,8 @@ body {
   color: #2c3e50;
 }
 
+/* NAV */
+
 #nav {
   padding: 30px;
 }
@@ -145,5 +147,36 @@ body {
 
 .default:hover {
   background: #e7e7e7;
+}
+
+/* Table */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table tr {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+}
+.left-column {
+  text-align: left;
+  padding: 8px;
+}
+
+/* INPUTS */
+input[type="text"],
+input[type="number"] {
+  border: 2px solid #42b983;
+  border-radius: 4px;
+  width: Calc(100% - 24px);
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+}
+
+/* H1-3 */
+h3.muted{
+  margin:8px;
+  opacity: 0.7;
 }
 </style>

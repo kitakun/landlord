@@ -5,7 +5,7 @@
 
     <ErrorBlock :errorData="lastError" />
 
-    <table class="globals-table">
+    <table class="table">
       <tr>
         <td class="left-column">
           <div>
@@ -66,18 +66,6 @@ export default class GlobalsView extends Vue {
 </script>
 
 <style scoped>
-.globals-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-.globals-table tr {
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 8px;
-}
-.left-column {
-  text-align: left;
-  padding: 8px;
-}
 .right-column {
   text-align: right;
   padding: 8px;

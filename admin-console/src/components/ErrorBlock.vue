@@ -14,11 +14,19 @@ export default class ErrorBlockComponent extends Vue {
 
   @Watch("errorData")
   onErrorChanged(newError: any): void {
-    if (typeof newError === "string") {
+    if (newError === null) {
+      this.errorText = "";
+    } else if (typeof newError === "string") {
       this.errorText = newError;
+    } else if (newError.error) {
+      this.errorText = newError.error;
     } else if (newError.response) {
       if (newError.response.data) {
-        this.errorText = newError.response.data;
+        if (newError.response.data.error) {
+          this.errorText = newError.response.data.error;
+        } else {
+          this.errorText = newError.response.data;
+        }
       } else {
         this.errorText = newError.response;
       }

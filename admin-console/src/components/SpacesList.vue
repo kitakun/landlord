@@ -46,6 +46,7 @@ import ErrorBlock from "@/components/ErrorBlock.vue";
 // Models
 import { AdminExisgintSpace } from "../../../app/models/Admin.model";
 
+// May be all this logic should be in home page?
 @Component({
   components: {
     Loader,
@@ -73,8 +74,15 @@ export default class SpacesList extends Vue {
       method: "POST",
       url: `http://127.0.0.1:3000/ultra/startlanding/${item.Name}`
     })
-      .then(resp => this.reloadList())
-      .catch((resp) => {
+      .then(resp => {
+        this.reloadList();
+        this.$notify({
+          group: "main",
+          title: "Result",
+          text: `${item.Name} successfully enabled`
+        });
+      })
+      .catch(resp => {
         this.lastError = resp;
         this.isLoading = false;
       });
@@ -90,7 +98,14 @@ export default class SpacesList extends Vue {
       method: "POST",
       url: `http://127.0.0.1:3000/ultra/stoplanding/${item.Name}`
     })
-      .then(resp => this.reloadList())
+      .then(resp => {
+        this.reloadList();
+        this.$notify({
+          group: "main",
+          title: "Result",
+          text: `${item.Name} successfully disabled`
+        });
+      })
       .catch(() => (this.isLoading = false));
   }
 
@@ -100,7 +115,7 @@ export default class SpacesList extends Vue {
       url: "http://127.0.0.1:3000/ultra/getlist"
     })
       .then(resp => (this.loadedData = resp.data))
-      .catch((resp) => {
+      .catch(resp => {
         this.lastError = resp;
       })
       .finally(() => (this.isLoading = false));
