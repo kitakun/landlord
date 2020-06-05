@@ -4,7 +4,8 @@ interface JsonError {
     error: string;
 }
 
-export function errorMiddleware(err: any, req: Request, res: Response) {
+/** Handle application errors and send them as JSON object with message */
+export function errorMiddleware(err: any, _: Request, res: Response, __: (data?: any) => void) {
     console.error(err.message);
 
     if (!err.statusCode) {

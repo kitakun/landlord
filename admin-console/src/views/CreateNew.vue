@@ -105,7 +105,11 @@ export default class GlobalsView extends Vue {
     this.clearErrors();
     Axios({
       method: "POST",
-      url: `http://127.0.0.1:3000/ultra/createNew`
+      url: `http://127.0.0.1:3000/ultra/createNew`,
+      data:{
+        name: this.name,
+        port: this.port
+      }
     })
       .then(resp => {
         this.clearForm();

@@ -9,6 +9,7 @@ import { notFoundMiddleware, errorMiddleware } from '../utils/errorMiddleware';
 // Database
 import landingRepository from '../db/Repositories/LandingEntityRepo';
 import dbCreator from '../db/createTables';
+import { ultraAdminMiddleware } from '../utils/ultraAdminMiddleware';
 
 /**
  * Ultra admin space
@@ -18,22 +19,25 @@ export default class UltraController implements IInjectableController {
 
     public Inject(app: express.Application): void {
 
-        //GET home route
-        app.get('/ultra', (req, res, next: (errd?: any) => void) => this._secureAction(req, res, () => {
-            res.send('index.html is not implemented yet');
-        }));
+        app.use(ultraAdminMiddleware);
 
-        //GET create db from zero
-        app.post('/ultra/createdb', (req, res) => this._secureAction(req, res, () => {
+        // GET home route
+        app.get('/ultra', (req, res, next: (errd?: any) => void) => {
+            throw new Error('guess who');
+            //res.send('index.html is not implemented yet');
+        });
+
+        // POST create db from zero
+        app.post('/ultra/createdb', (req, res) => {
             const dbCreatorInstance = new dbCreator();
             dbCreatorInstance
                 .CreateTables()
                 .then(() => res.send('Success'))
                 .catch(err => res.status(405).send(err?.message));
-        }));
+        });
 
-        //POST start existing landing
-        app.post('/ultra/startlanding/:name', (req, res) => this._secureAction(req, res, () => {
+        // POST start existing landing
+        app.post('/ultra/startlanding/:name', (req, res) => {
             const landingName = req.params.name;
             if (!landingName) {
                 res
@@ -59,10 +63,10 @@ export default class UltraController implements IInjectableController {
                     })
                     .catch(err => res.status(405).send(err.message));
             }
-        }));
+        });
 
-        //POST stop existing landing
-        app.post('/ultra/stoplanding/:name', (req, res) => this._secureAction(req, res, () => {
+        // POST stop existing landing
+        app.post('/ultra/stoplanding/:name', (req, res) => {
             const landingName = req.params.name;
             if (!landingName) {
                 res
@@ -79,9 +83,10 @@ export default class UltraController implements IInjectableController {
                         .send(`Landing ${landingName} not working, skip`);
                 }
             }
-        }));
+        });
 
-        app.post('/ultra/getlist', (req, res) => this._secureAction(req, res, () => {
+        // POST get all existing landings with statuses
+        app.post('/ultra/getlist', (req, res) => {
             landingRepository
                 .loadAllLandingsWithPortsAsync()
                 .then(resp => {
@@ -100,29 +105,11 @@ export default class UltraController implements IInjectableController {
                     res.status(500)
                         .json({ message: 'error while loading loadAllLandingsWithPortsAsync' });
                 });
-        }));
+        });
 
         app.get('*', notFoundMiddleware);
         app.post('*', notFoundMiddleware);
 
-        app.use((e: any, req: any, res: any, n: any) => errorMiddleware(e, req, res));
-    }
-
-    private _secureAction(req: express.Request, res: express.Response, action: () => void): void {
-        const currentIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-        const host = req.get('host');
-        const settingsData = settings.getSettings();
-
-        const ultraDomain = settingsData.UltraDomain || '';
-        const trustedIPs = settingsData.TrustedIPs || [];
-
-        if (trustedIPs.findIndex(f => f == currentIp) >= 0
-            && ultraDomain == host) {
-            action();
-        } else {
-            res
-                .status(404)
-                .send('Not found');
-        }
+        app.use(errorMiddleware);
     }
 }
