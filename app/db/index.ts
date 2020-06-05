@@ -20,9 +20,13 @@ interface IPoolClientWithLog extends PoolClient {
     query: (...args: any) => any;
 }
 
+interface IQueryResult<T> {
+    rows: Array<T>;
+}
+
 export default interface Idb {
     query(text: string, params: any[], callback: IQueryCallback): any;
-    queryPromise(text: string, params: any): Promise<any>,
+    queryPromise<T>(text: string, params: any): Promise<IQueryResult<T>>,
     getClient: (callback: (err: Error, client: PoolClient, done: (release?: any) => void) => void) => void;
     validateConnection(): Promise<boolean>;
     hasTables(): Promise<boolean>;
@@ -77,7 +81,7 @@ const moduleSingleton: Idb = {
         var result = await pool.query('SELECT NOW()');
         return !!result;
     },
-    async hasTables(): Promise<boolean>{
+    async hasTables(): Promise<boolean> {
         const hasTableScriptPath = path.join(__dirname, '../../PsqlScripts/System', 'ShowAllTables.sql');
         const hasTableScriptBody = fs.readFileSync(hasTableScriptPath).toString('utf8');
         const { rows } = await this.queryPromise(hasTableScriptBody, null);

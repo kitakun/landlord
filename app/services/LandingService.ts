@@ -15,7 +15,11 @@ const landingService = {
      * Inject all static resources of given namespace to land
      * @param namespace landing name
      */
-    InjectSingleSpace: (namespace: string, port: number) => {
+    InjectSingleSpace: (namespace: string, port: number, onSuccess?: () => void): boolean => {
+
+        if (landingStack.stack.inWork.find(f => f.namespace === namespace))
+            return false;
+
         const namespaceRootFoldier = path.join(__dirname, `../content/${namespace}`);
         const allSupportedFiles = fs.readdirSync(namespaceRootFoldier);
 
@@ -108,7 +112,12 @@ const landingService = {
         landingInWork.server = landingEpxressApp.listen(port, () => {
             console.log(`[LandingController] Landing '${namespace}' started at port ${port}`);
             landingStack.stack.inWork.push(landingInWork);
+            if (onSuccess) {
+                onSuccess();
+            }
         });
+
+        return true;
     },
 
     /**

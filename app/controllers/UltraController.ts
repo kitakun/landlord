@@ -3,6 +3,8 @@ import express = require('express');
 import IInjectableController from './InjectableController';
 import settings from '../services/SettingsService';
 import landingService from '../services/LandingService';
+import { stack } from '../utils/landingStack';
+import { AdminExisgintSpace } from '../models/Admin.model';
 // Database
 import landingRepository from '../db/Repositories/LandingEntityRepo';
 import dbCreator from '../db/createTables';
@@ -40,10 +42,13 @@ export default class UltraController implements IInjectableController {
                 landingRepository.loadLandingPortByNameAsync(landingName)
                     .then((result) => {
                         if (result.rows.length > 0) {
-                            const loadedPort = result.rows[0].port;
+                            const loadedPort = result.rows[0].Port;
                             if (loadedPort) {
-                                landingService.InjectSingleSpace(landingName, loadedPort);
-                                res.send(`${landingName} runned at ${loadedPort} port!`);
+                                if (!landingService.InjectSingleSpace(landingName, loadedPort, () => {
+                                    res.send(`${landingName} runned at ${loadedPort} port!`)
+                                })) {
+                                    res.send(`${landingName} already runned!`);
+                                }
                             } else {
                                 res.send(`${landingName} has ${loadedPort} and he treated as incorrect!`);
                             }
@@ -64,13 +69,36 @@ export default class UltraController implements IInjectableController {
                     .send('Name is missed');
             } else {
                 if (landingService.ShutdownLanding(landingName)) {
-                    res.send(`Landing ${landingName} stopped`);
+                    const responseText = `Landing ${landingName} stopped`;
+                    console.log(responseText);
+                    res.send(`responseText`);
                 } else {
                     res
                         .status(405)
                         .send(`Landing ${landingName} not working, skip`);
                 }
             }
+        }));
+
+        app.post('/ultra/getlist', (req, res) => this._secureAction(req, res, () => {
+            landingRepository
+                .loadAllLandingsWithPortsAsync()
+                .then(resp => {
+                    const frontendData = resp.rows.map(row => {
+                        const anyRow = row as AdminExisgintSpace;
+
+                        anyRow.isEnabled = !!stack.inWork.find(f => f.namespace === row.Name);
+
+                        return anyRow
+                    });
+
+                    return res.json(frontendData);
+                })
+                .catch(err => {
+                    console.error(err);
+                    res.status(500)
+                        .json({ message: 'error while loading loadAllLandingsWithPortsAsync' });
+                });
         }));
     }
 
