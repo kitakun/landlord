@@ -24,12 +24,12 @@ export default class UltraController implements IInjectableController {
         }));
 
         //GET create db from zero
-        app.get('/ultra/createdb', (req, res) => this._secureAction(req, res, () => {
+        app.post('/ultra/createdb', (req, res) => this._secureAction(req, res, () => {
             const dbCreatorInstance = new dbCreator();
             dbCreatorInstance
                 .CreateTables()
                 .then(() => res.send('Success'))
-                .catch(err => res.send(err?.message));
+                .catch(err => res.status(405).send(err?.message));
         }));
 
         //POST start existing landing
@@ -48,16 +48,16 @@ export default class UltraController implements IInjectableController {
                                 if (!landingService.InjectSingleSpace(landingName, loadedPort, () => {
                                     res.send(`${landingName} runned at ${loadedPort} port!`)
                                 })) {
-                                    res.send(`${landingName} already runned!`);
+                                    res.status(405).send(`${landingName} already runned!`);
                                 }
                             } else {
-                                res.send(`${landingName} has ${loadedPort} and he treated as incorrect!`);
+                                res.status(405).send(`${landingName} has ${loadedPort} and he treated as incorrect!`);
                             }
                         } else {
-                            res.send(`${landingName} not found in db!`);
+                            res.status(405).send(`${landingName} not found in db!`);
                         }
                     })
-                    .catch(err => res.send(err.message));
+                    .catch(err => res.status(405).send(err.message));
             }
         }));
 
@@ -72,7 +72,7 @@ export default class UltraController implements IInjectableController {
                 if (landingService.ShutdownLanding(landingName)) {
                     const responseText = `Landing ${landingName} stopped`;
                     console.log(responseText);
-                    res.send(`responseText`);
+                    res.send(responseText);
                 } else {
                     res
                         .status(405)

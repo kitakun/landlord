@@ -15,6 +15,11 @@ const routes: Array<RouteConfig> = [
     name: 'CreateNew',
     component: () => import('../views/CreateNew.vue'),
   },
+  {
+    path: '/globals',
+    name: 'Globals',
+    component: () => import('../views/Globals.vue'),
+  },
 ];
 
 const router = new VueRouter({

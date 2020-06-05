@@ -2,12 +2,15 @@
   <div id="app">
     <div id="nav">
       <router-link to="/">Home</router-link>|
-      <router-link to="/new">Create New</router-link>
+      <router-link to="/new">Create New</router-link>|
+      <router-link to="/globals">Globals</router-link>
     </div>
 
     <div class="app-content">
       <router-view />
     </div>
+
+    <notifications group="main" />
   </div>
 </template>
 

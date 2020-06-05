@@ -17,7 +17,11 @@ export default class ErrorBlockComponent extends Vue {
     if (typeof newError === "string") {
       this.errorText = newError;
     } else if (newError.response) {
-      this.errorText = newError.response;
+      if (newError.response.data) {
+        this.errorText = newError.response.data;
+      } else {
+        this.errorText = newError.response;
+      }
     } else if (newError.message) {
       this.errorText = newError.message;
     } else {
