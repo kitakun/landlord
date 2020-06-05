@@ -5,7 +5,7 @@ interface ILandingEntity {
     /**
      * Identifier
      */
-    Id: number;
+    Id?: number;
     /**
      * Name for admin's
      */
@@ -22,7 +22,7 @@ interface ILandingEntity {
     /**
      * All used data for custom logic
      */
-    Data: ILandingDataEntity[] | undefined;
+    Data?: ILandingDataEntity[];
 }
 
 /**

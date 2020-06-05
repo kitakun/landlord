@@ -10,6 +10,7 @@ import { notFoundMiddleware, errorMiddleware } from '../utils/errorMiddleware';
 import landingRepository from '../db/Repositories/LandingEntityRepo';
 import dbCreator from '../db/createTables';
 import { ultraAdminMiddleware } from '../utils/ultraAdminMiddleware';
+import LandingCreationService from '../services/LandingCreationService';
 
 /**
  * Ultra admin space
@@ -20,11 +21,11 @@ export default class UltraController implements IInjectableController {
     public Inject(app: express.Application): void {
 
         app.use(ultraAdminMiddleware);
+        app.use(express.json());
 
         // GET home route
         app.get('/ultra', (req, res, next: (errd?: any) => void) => {
-            throw new Error('guess who');
-            //res.send('index.html is not implemented yet');
+            res.send('index.html is not implemented yet');
         });
 
         // POST create db from zero
@@ -105,6 +106,23 @@ export default class UltraController implements IInjectableController {
                     res.status(500)
                         .json({ message: 'error while loading loadAllLandingsWithPortsAsync' });
                 });
+        });
+
+        app.post('/ultra/createnew', (req, res) => {
+            const recievedData = req.body as { name: string, port?: number };
+            if (!recievedData.name || recievedData.name.length <= 3) {
+                res.status(405).send({ message: 'Please choose better name' });
+            } else if (recievedData.port && recievedData.port < 998) {
+                res.status(405).send({ message: 'Please choose better port' });
+            } else {
+
+                LandingCreationService
+                    .createDirectory(recievedData.name, recievedData.port)
+                    .then((result) => {
+                        res.send('ok');
+                    })
+                    .catch((getErr) => res.status(500).send(getErr));
+            }
         });
 
         app.get('*', notFoundMiddleware);

@@ -103,13 +103,9 @@ export default class GlobalsView extends Vue {
     if (!this.validateInputs()) return;
     this.isBusy = true;
     this.clearErrors();
-    Axios({
-      method: "POST",
-      url: `http://127.0.0.1:3000/ultra/createNew`,
-      data:{
-        name: this.name,
-        port: this.port
-      }
+    Axios.post(`http://127.0.0.1:3000/ultra/createnew`, {
+      name: this.name,
+      port: this.port
     })
       .then(resp => {
         this.clearForm();
