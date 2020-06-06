@@ -43,6 +43,7 @@ import axios from "axios";
 // Components
 import Loader from "@/components/Loader.vue";
 import ErrorBlock from "@/components/ErrorBlock.vue";
+import { prepareUrl } from "../utils";
 // Models
 import { AdminExisgintSpace } from "../../../app/models/Admin.model";
 
@@ -72,7 +73,7 @@ export default class SpacesList extends Vue {
     this.isLoading = true;
     axios({
       method: "POST",
-      url: `http://127.0.0.1:3000/ultra/startlanding/${item.Name}`
+      url: prepareUrl(`/ultra/startlanding/${item.Name}`)
     })
       .then(resp => {
         this.reloadList();
@@ -96,7 +97,7 @@ export default class SpacesList extends Vue {
     this.isLoading = true;
     axios({
       method: "POST",
-      url: `http://127.0.0.1:3000/ultra/stoplanding/${item.Name}`
+      url: prepareUrl(`/ultra/stoplanding/${item.Name}`)
     })
       .then(resp => {
         this.reloadList();
@@ -112,7 +113,7 @@ export default class SpacesList extends Vue {
   private reloadList(): Promise<any> {
     return axios({
       method: "POST",
-      url: "http://127.0.0.1:3000/ultra/getlist"
+      url: prepareUrl("/ultra/getlist")
     })
       .then(resp => (this.loadedData = resp.data))
       .catch(resp => {

@@ -1,4 +1,8 @@
 import fs from 'fs';
+const { promisify } = require('util');
+const { resolve } = require('path');
+const readdir = promisify(fs.readdir);
+const stat = promisify(fs.stat);
 
 export function checkFileExists(filepath: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
@@ -21,3 +25,13 @@ export function mkdirAsync(filepath: string): Promise<any> {
     });
 }
 
+export async function getFilesAsync(dir: string): Promise<string[]> {
+    const subdirs = await readdir(dir);
+
+    const files = await Promise.all(subdirs.map(async (subdir: string) => {
+        const res = resolve(dir, subdir) as string;
+        return (await stat(res)).isDirectory() ? getFilesAsync(res) : res;
+    })) as string[];
+
+    return files.reduce((a, f) => a.concat(f as any), []);
+}

@@ -27,8 +27,13 @@ export default class LandingController implements IInjectableController {
                     landingRepo
                         .loadAllLandingsWithPortsAsync()
                         .then((allLandings) => {
-                            allLandings.rows.forEach(landingEntity =>
-                                landingService.InjectSingleSpace(landingEntity.Name, landingEntity.WebPort));
+                            allLandings.rows.forEach(landingEntity => {
+                                try {
+                                    landingService.InjectSingleSpace(landingEntity.Name, landingEntity.WebPort);
+                                } catch (err) {
+                                    console.error(err);
+                                }
+                            });
                         });
                 }
             });

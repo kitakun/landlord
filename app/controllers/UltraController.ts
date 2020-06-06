@@ -1,16 +1,16 @@
+import fs from 'fs';
+import path from 'path';
 import express = require('express');
 // Components
 import IInjectableController from './InjectableController';
-import settings from '../services/SettingsService';
 import landingService from '../services/LandingService';
 import { stack } from '../utils/landingStack';
 import { AdminExisgintSpace } from '../models/Admin.model';
-import { notFoundMiddleware, errorMiddleware } from '../utils/errorMiddleware';
+import { ultraAdminMiddleware, getFilesAsync, notFoundMiddleware, errorMiddleware } from '../utils';
+import LandingCreationService from '../services/LandingCreationService';
 // Database
 import landingRepository from '../db/Repositories/LandingEntityRepo';
 import dbCreator from '../db/createTables';
-import { ultraAdminMiddleware } from '../utils/ultraAdminMiddleware';
-import LandingCreationService from '../services/LandingCreationService';
 
 /**
  * Ultra admin space
@@ -23,13 +23,40 @@ export default class UltraController implements IInjectableController {
         app.use(ultraAdminMiddleware);
         app.use(express.json());
 
-        // GET home route
-        app.get('/ultra', (req, res, next: (errd?: any) => void) => {
-            res.send('index.html is not implemented yet');
-        });
+        const namespaceRootFoldier = path.join(__dirname, `../content/admin`);
+
+        getFilesAsync(namespaceRootFoldier)
+            .then(allExistingFiles => {
+
+                const haveIndexFile = allExistingFiles.some(f => f.indexOf('index.html') >= 0);
+
+                // GET home route
+                app.get('/ultra', (_, res, next: (errd?: any) => void) => {
+                    if (haveIndexFile) {
+                        res.sendfile(path.join(namespaceRootFoldier, 'index.html'));
+                    } else {
+                        res.send('index.html is not implemented yet');
+                    }
+                });
+
+                // server all static content
+                allExistingFiles
+                    .filter(f => f.indexOf('index.html') < 0)
+                    .forEach(resourceFile => {
+                        const relativePath = resourceFile.slice(resourceFile.indexOf('admin') + 'admin'.length);
+                        const contentUrl = path.join('/ultra/admin', relativePath).replace(/\\/g, "/");
+                        app.get(contentUrl, (_, res) => res.sendfile(resourceFile));
+                    });
+
+                this.SyncInject(app);
+            })
+            .catch(err => console.error(err));
+    }
+
+    private SyncInject(app: express.Application): void {
 
         // POST create db from zero
-        app.post('/ultra/createdb', (req, res) => {
+        app.post('/ultra/createdb', (_, res) => {
             const dbCreatorInstance = new dbCreator();
             dbCreatorInstance
                 .CreateTables()
@@ -87,7 +114,7 @@ export default class UltraController implements IInjectableController {
         });
 
         // POST get all existing landings with statuses
-        app.post('/ultra/getlist', (req, res) => {
+        app.post('/ultra/getlist', (_, res) => {
             landingRepository
                 .loadAllLandingsWithPortsAsync()
                 .then(resp => {

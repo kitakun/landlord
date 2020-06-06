@@ -54,6 +54,7 @@ import Notifications from "vue-notification";
 // Components
 import Loader from "@/components/Loader.vue";
 import ErrorBlock from "@/components/ErrorBlock.vue";
+import { prepareUrl } from "../utils";
 
 @Component({
   components: {
@@ -103,7 +104,7 @@ export default class GlobalsView extends Vue {
     if (!this.validateInputs()) return;
     this.isBusy = true;
     this.clearErrors();
-    Axios.post(`http://127.0.0.1:3000/ultra/createnew`, {
+    Axios.post(prepareUrl(`/ultra/createnew`), {
       name: this.name,
       port: this.port
     })

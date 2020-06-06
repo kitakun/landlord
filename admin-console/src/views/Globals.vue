@@ -30,6 +30,7 @@ import Notifications from "vue-notification";
 // Components
 import Loader from "@/components/Loader.vue";
 import ErrorBlock from "@/components/ErrorBlock.vue";
+import { prepareUrl } from "../utils";
 
 @Component({
   components: {
@@ -50,7 +51,7 @@ export default class GlobalsView extends Vue {
     this.clearErrors();
     Axios({
       method: "POST",
-      url: `http://127.0.0.1:3000/ultra/createdb`
+      url: prepareUrl(`/ultra/createdb`)
     })
       .then(resp =>
         this.$notify({
