@@ -9,7 +9,7 @@ import landingRepository from '../db/Repositories/LandingEntityRepo';
 export default class LandingCreationService {
 
     static async createDirectory(name: string, port?: number): Promise<any> {
-        const dirPath = path.join(__dirname, `../content/${name}`);
+        const dirPath = path.join(__dirname, '..', 'content', name);
 
         const isDirExists = await checkFileExists(dirPath);
         if (!isDirExists) {

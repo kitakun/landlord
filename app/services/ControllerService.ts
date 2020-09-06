@@ -1,10 +1,10 @@
 // System
-import path = require('path');
-import fs = require('fs');
+import path from 'path';
+import fs from 'fs';
 // Packages
-import express = require('express');
+import express from 'express';
 // Components
-import IInjectableController from '../controllers/InjectableController';
+import IInjectableController from '../controllers/base/InjectableController';
 
 var isAlreadyInited: Boolean = false;
 
@@ -22,12 +22,12 @@ const singletoneService: IControllerService = {
         if (isAlreadyInited)
             return console.warn('[ControllersService] Controllers already inited!');
 
-        const directoryPath = path.join(__dirname, '../controllers');
+        const directoryPath = path.join(__dirname, '..', 'controllers');
 
-        const files = fs.readdirSync(directoryPath);
+        const files = fs.readdirSync(directoryPath).filter(f => f !== 'base');
 
         files.forEach(function (file) {
-            var Controller = require(path.join(directoryPath, file)).default;
+            const Controller = require(path.join(directoryPath, file)).default;
             if (Controller) {
                 var controllerInstance: IInjectableController = new Controller();
 

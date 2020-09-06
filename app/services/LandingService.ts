@@ -9,6 +9,8 @@ import * as landingStack from '../utils/landingStack';
 
 const supportedStaticFormats = ['.css', '.js', '.ico'];
 
+export const getContentRoot = (namespace: string): string => path.join(__dirname, '..', 'content', namespace);
+
 const landingService = {
 
     /**
@@ -20,7 +22,8 @@ const landingService = {
         if (landingStack.stack.inWork.find(f => f.namespace === namespace))
             return false;
 
-        const namespaceRootFoldier = path.join(__dirname, `../content/${namespace}`);
+        const namespaceRootFoldier = getContentRoot(namespace);
+
         const allSupportedFiles = fs.readdirSync(namespaceRootFoldier);
 
         const landingEpxressApp = express();
@@ -57,7 +60,7 @@ const landingService = {
                 landingInWork.htmlRoutes.push(resourceRoute);
 
                 landingEpxressApp.get(resourceRoute, (req, res) => {
-                    res.sendfile(path.join(__dirname, `../content/${namespace}/${staticFile}.html`));
+                    res.sendfile(path.join(__dirname, '..', 'content', namespace, `${staticFile}.html`));
                 });
             }
         });
@@ -73,7 +76,7 @@ const landingService = {
                 landingInWork.mustacheRoutes.push(resourceRoute);
 
                 landingEpxressApp.get(resourceRoute, (_, res) => {
-                    const templatePath = path.join(__dirname, `../content/${namespace}/${staticFile}.mustache`);
+                    const templatePath = path.join(__dirname, '..', 'content', namespace, `${staticFile}.mustache`);
                     fs.readFile(templatePath, function (err, data) {
                         if (err)
                             throw err;
@@ -91,11 +94,11 @@ const landingService = {
         if (indexFile) {
             if (indexFile.endsWith('html')) {
                 landingEpxressApp.get(`/`, (_, res) => {
-                    res.sendfile(path.join(__dirname, `../content/${namespace}/index.html`));
+                    res.sendfile(path.join(__dirname, '..', 'content', namespace, `index.html`));
                 });
             } else {
                 landingEpxressApp.get(`/landing/${namespace}`, (_, res) => {
-                    const templatePath = path.join(__dirname, `../content/${namespace}/index.mustache`);
+                    const templatePath = path.join(__dirname, '..', 'content', namespace, `index.mustache`);
                     fs.readFile(templatePath, function (err, data) {
                         if (err)
                             throw err;

@@ -1,8 +1,7 @@
-import fs from 'fs';
 import path from 'path';
-import express = require('express');
+import express from 'express';
 // Components
-import IInjectableController from './InjectableController';
+import IInjectableController from './base/InjectableController';
 import landingService from '../services/LandingService';
 import { stack } from '../utils/landingStack';
 import { AdminExisgintSpace } from '../models/Admin.model';
@@ -18,39 +17,40 @@ import dbCreator from '../db/createTables';
  */
 export default class UltraController implements IInjectableController {
 
-    public Inject(app: express.Application): void {
+    public async Inject(app: express.Application): Promise<void> {
 
         app.use(ultraAdminMiddleware);
         app.use(express.json());
 
-        const namespaceRootFoldier = path.join(__dirname, `../content/admin`);
+        const namespaceRootFoldier = path.join(__dirname, '..', 'content', 'admin');
 
-        getFilesAsync(namespaceRootFoldier)
-            .then(allExistingFiles => {
+        try {
+            const allExistingFiles = await getFilesAsync(namespaceRootFoldier);
 
-                const haveIndexFile = allExistingFiles.some(f => f.indexOf('index.html') >= 0);
+            const haveIndexFile = allExistingFiles.some(f => f.indexOf('index.html') >= 0);
 
-                // GET home route
-                app.get('/ultra', (_, res, next: (errd?: any) => void) => {
-                    if (haveIndexFile) {
-                        res.sendfile(path.join(namespaceRootFoldier, 'index.html'));
-                    } else {
-                        res.send('index.html is not implemented yet');
-                    }
+            // GET home route
+            app.get('/ultra', (_, res, next: (errd?: any) => void) => {
+                if (haveIndexFile) {
+                    res.sendfile(path.join(namespaceRootFoldier, 'index.html'));
+                } else {
+                    res.send('index.html is not implemented yet');
+                }
+            });
+
+            // server all static content
+            allExistingFiles
+                .filter(f => f.indexOf('index.html') < 0)
+                .forEach(resourceFile => {
+                    const relativePath = resourceFile.slice(resourceFile.indexOf('admin') + 'admin'.length);
+                    const contentUrl = path.join('/ultra/admin', relativePath).replace(/\\/g, "/");
+                    app.get(contentUrl, (_, res) => res.sendfile(resourceFile));
                 });
 
-                // server all static content
-                allExistingFiles
-                    .filter(f => f.indexOf('index.html') < 0)
-                    .forEach(resourceFile => {
-                        const relativePath = resourceFile.slice(resourceFile.indexOf('admin') + 'admin'.length);
-                        const contentUrl = path.join('/ultra/admin', relativePath).replace(/\\/g, "/");
-                        app.get(contentUrl, (_, res) => res.sendfile(resourceFile));
-                    });
-
-                this.SyncInject(app);
-            })
-            .catch(err => console.error(err));
+            this.SyncInject(app);
+        } catch (err) {
+            console.error(err)
+        }
     }
 
     private SyncInject(app: express.Application): void {

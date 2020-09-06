@@ -1,6 +1,7 @@
 import fs from 'fs';
-const { promisify } = require('util');
-const { resolve } = require('path');
+import { promisify } from 'util';
+import { resolve } from 'path';
+
 const readdir = promisify(fs.readdir);
 const stat = promisify(fs.stat);
 

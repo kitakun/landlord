@@ -37,4 +37,4 @@ const startWatching = () => {
 
 const getSettings = () => settings;
 
-export = { getSettings, startWatching };
+export default { getSettings, startWatching };

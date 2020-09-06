@@ -1,6 +1,6 @@
-import express = require('express');
+import express, { Request, Response } from 'express';
 // Components
-import IInjectableController from "./InjectableController";
+import IInjectableController from './base/InjectableController';
 
 /**
  * Root server index page
@@ -12,8 +12,12 @@ export default class HomeController implements IInjectableController {
         HomeController.startedAt = Date.now();
 
         //GET home route
-        app.get('/', (req, res) => res.json({
+        app.get('/', this.getRoot.bind(this));
+    }
+
+    private getRoot(req: Request, res: Response) {
+        res.json({
             aliveTime: Date.now() - HomeController.startedAt
-        }));
+        })
     }
 }
